@@ -10,10 +10,32 @@
     <form action="/search">
         <div class="input-group">
             <span class="input-group-text">Card Name</span>
-            <input type="text" id="searchText" name="searchText" class="form-control"><br><br>
+            <input type="text" id="searchText" name="q" class="form-control"><br><br>
         </div>
     </br>
-        <a href="#" class="btn btn-primary" id="search">Search Our Cases</a>
+        <input type="submit" class="btn btn-primary" value="Submit">
     </form>
 </div>
+<div class="mt-4 row">
+    {% for i in range(0, len) %}
+        <div class="col-sm-3">
+            <div class="card">
+                <h5 class="card-header">{{ cards[i].name() }}</h5>
+                <img class="card-img-top" src={{ cards[i].image_uris(0, 'normal') }}/>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Colors:</strong> {{ cards[i].colors() }}</li>
+                    <li class="list-group-item"><strong>Mana:</strong> {{ cards[i].mana_cost() }}</li>
+                    <li class="list-group-item"><strong>Reprinted:</strong> {{ cards[i].reprint() }}</li>
+                    <li class="list-group-item"><strong>Collector's ID:</strong> {{ cards[i].collector_number() }}</li>
+                    <li class="list-group-item"><strong>Set:</strong> {{ cards[i].set_code().upper() + " - " + cards[i].set_name() }}</li>
+                    <li class="list-group-item"><strong>Prices:</strong> USD: ${{ cards[i].prices('usd') }} | Foil: ${{ cards[i].prices('usd_foil') }}</li>
+                  </ul>
+                <div class="card-footer text-muted">
+                    <a href="#" class="btn disabled" id="reserve">Reserve Card</a>
+                    <a href="#" class="btn btn-success" id="info">Open Scryfall</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
 {% endblock %}

@@ -7,7 +7,7 @@ import csv
 from flask import Flask, Blueprint, render_template, request, jsonify, redirect, url_for
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = 'T:/Python_Practice/Dragon Lookup/uploads'
+UPLOAD_FOLDER = 'T:/Python_Practice/DragonLookup-v2/uploads'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
@@ -20,35 +20,10 @@ def home():
     header = "Welcome to Dragon Lookup"
     subtitle = "This tool was designed to take the existing card inventory from our cases and digitize them for you to browse. Here you can request to have cards pulled from the case and set aside for you behind the counter."
     
-    # Check that Inventory File is Present
-    if os.path.isfile(UPLOAD_FOLDER + "/case_inventory.csv"):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-        # Set Preview Card List
-        cards.clear()
-        card_strings = []
-
-        # Retrieve File List from Uploaded CSV
-        ifile  = open(UPLOAD_FOLDER + "/case_inventory.csv", "rt", encoding="utf8")
-        read = csv.reader(ifile)
-        next(read, None)
-        size = read.line_num
-        for row in read:
-            row = str(row)
-            row = row[2:size - 3]
-            scryCard = scrython.cards.Named(fuzzy=row)
-            card_strings.append(scryCard.name())
-
-        #card_strings = ["Bitterbow Sharpshooter", "Ambush Paratrooper", "Calamaty's Wake", "Bitterbow Sharpshooter", "Ambush Paratrooper", "Calamaty's Wake", "Bitterbow Sharpshooter", "Ambush Paratrooper"]
-
-        # For each card in the string, run a search and come back with Scryfall Information
-        for card in card_strings:
-            card_data = scrython.cards.Named(fuzzy=card)
-            cards.append(card_data)
+    if cards != []:
         return render_template("index.html", header=header, subtitle=subtitle, len = len(cards), cards=cards)
     else:
-        return redirect(url_for("upload"))
+        return redirect(url_for("initialize"))
 
 @app.route("/upload", methods = ['POST', 'GET'])
 def upload():
@@ -67,7 +42,7 @@ def upload():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'case_inventory.csv'))
-        return render_template("upload-complete.html", header=header, subtitle=subtitle)
+        return redirect(url_for("initialize"))
     else: #Get
         return render_template("upload.html", header=header, subtitle=subtitle)
 
@@ -76,7 +51,15 @@ def search():
     header = "Search For A Card"
     subtitle = "Here you can search for a specific card in our inventory."
 
-    return render_template("search.html", header=header, subtitle=subtitle)
+    cards_to_return = []
+    q  = request.args.get('q', None)
+    if q != None:
+        cards_to_return = []
+        for card in cards:
+            if q.lower() in card.name().lower():
+                cards_to_return.append(card)
+
+    return render_template("search.html", header=header, subtitle=subtitle, len = len(cards_to_return), cards=cards_to_return)
 
 @app.route("/lookup/", methods = ['POST', 'GET'])
 def lookup():
@@ -98,6 +81,35 @@ def lookup():
         card=card,
         set_code=set_code
     )
+
+@app.route("/initialize/")
+def initialize():
+    if os.path.isfile(UPLOAD_FOLDER + "/case_inventory.csv"):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        # Set Preview Card List
+        cards.clear()
+        card_strings = []
+
+        # Retrieve File List from Uploaded CSV
+        ifile  = open(UPLOAD_FOLDER + "/case_inventory.csv", "rt", encoding="utf8")
+        read = csv.reader(ifile)
+        next(read, None)
+        size = read.line_num
+        for row in read:
+            row = str(row)
+            row = row[2:size - 3]
+            scryCard = scrython.cards.Named(fuzzy=row)
+            card_strings.append(scryCard.name())
+
+        # For each card in the string, run a search and come back with Scryfall Information
+        for card in card_strings:
+            card_data = scrython.cards.Named(fuzzy=card)
+            cards.append(card_data)
+        return redirect(url_for("home"))
+    else:
+        return redirect(url_for("upload"))
 
 @app.route("/json")
 def get_json():
