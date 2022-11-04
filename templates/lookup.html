@@ -1,0 +1,45 @@
+{% extends "core.html" %}
+{% block content%}
+<div class="row">
+    <div class="mt-4 mb-4 p-5 bg-primary text-white rounded">
+        <h1>{{ header }}</h1>
+        <p>{{ subtitle }}</p>
+    </div>
+</div>
+<div class="row">
+    <form action="/lookup">
+        <div class="input-group">
+            <span class="input-group-text">Set Code</span>
+            <input type="text" id="searchText" name="set_code" class="form-control" placeholder="HOU"><br><br>
+            <span class="input-group-text">Collectors ID Number</span>
+            <input type="text" id="searchText" name="col_id" class="form-control" placeholder="112"><br><br>
+        </div>
+    </br>
+        <input type="submit" class="btn btn-primary" value="Submit">
+    </form>
+</div>
+
+{% if set_code != None %}
+<div class="mt-4 row">
+    <div class="col-sm-3">
+        <div class="card">
+            <h5 class="card-header">{{ card.name }}</h5>
+            <img class="card-img-top" src={{ card.image_uris.normal }}/>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Colors:</strong> {{ card.colors }}</li>
+                <li class="list-group-item"><strong>Mana:</strong> {{ card.mana_cost }}</li>
+                <li class="list-group-item"><strong>Reprinted:</strong> {{ card.reprint }}</li>
+                <li class="list-group-item"><strong>Collector's ID:</strong> {{ card.collector_number }}</li>
+                <li class="list-group-item"><strong>Set:</strong> {{ card.set.upper() + " - " + card.set_name }}</li>
+              </ul>
+            <div class="card-body">
+                <p class="card-text"><strong>Flavor Text:</strong> {{ card.flavor_text }}</p>
+            </div>
+            <div class="card-footer text-muted">
+                <a href="#" class="btn btn-success" id="info">Open Scryfall</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

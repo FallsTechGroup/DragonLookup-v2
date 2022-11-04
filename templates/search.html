@@ -1,0 +1,19 @@
+{% extends "core.html" %}
+{% block content%}
+<div class="row">
+    <div class="mt-4 mb-4 p-5 bg-primary text-white rounded">
+        <h1>{{ header }}</h1>
+        <p>{{ subtitle }}</p>
+    </div>
+</div>
+<div class="row">
+    <form action="/search">
+        <div class="input-group">
+            <span class="input-group-text">Card Name</span>
+            <input type="text" id="searchText" name="searchText" class="form-control"><br><br>
+        </div>
+    </br>
+        <a href="#" class="btn btn-primary" id="search">Search Our Cases</a>
+    </form>
+</div>
+{% endblock %}

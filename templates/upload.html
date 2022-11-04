@@ -1,0 +1,21 @@
+{% extends "core.html" %}
+{% block content%}
+<div class="row">
+    <div class="mt-4 mb-4 p-5 bg-primary text-white rounded">
+        <h1>{{ header }}</h1>
+        <p>{{ subtitle }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <form method="post" enctype=multipart/form-data>
+            <input type=file name=file accept=".csv">
+            <input type=submit value=Upload>
+        </form>
+        </br>
+        <form action="/upload" method="post">
+            <button name="deleteButton" type="submit">Delete File</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
